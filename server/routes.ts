@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { insertStoreSchema, insertRatingSchema, UserRole } from "@shared/schema";
+import { createAdminUser } from "./createAdmin";
 
 // Middleware to check if user is authenticated
 const isAuthenticated = (req: Request, res: Response, next: Function) => {
@@ -29,6 +30,9 @@ const isStoreOwner = (req: Request, res: Response, next: Function) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Ensure admin user exists
+  await createAdminUser();
+  
   // Set up authentication routes
   setupAuth(app);
 
