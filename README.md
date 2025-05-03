@@ -10,7 +10,7 @@ A web-based application that allows users to rate and review stores based on the
 - 📝 Write and view reviews
 - 📊 Display average ratings and review count
 - 🔍 Filter stores based on ratings
-- 🛡️ Admin panel to manage reviews
+- 🛡️ Admin panel to manage reviews For Admin Login Use username: admin Password: Admin123!
 - 📱 Responsive design for all devices
 
 ---
