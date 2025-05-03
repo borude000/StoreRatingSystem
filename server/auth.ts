@@ -2,9 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
 import session from "express-session";
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
-import { promisify } from "util";
-import * as bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { User as SelectUser, UserRole, insertUserSchema } from "@shared/schema";
 
@@ -14,30 +12,13 @@ declare global {
   }
 }
 
-const scryptAsync = promisify(scrypt);
-
 async function hashPassword(password: string) {
-  const salt = randomBytes(16).toString("hex");
-  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-  return `${buf.toString("hex")}.${salt}`;
+  return bcrypt.hash(password, 10);
 }
 
 async function comparePasswords(supplied: string, stored: string) {
-  // Check if it's a bcrypt hash (starts with $2b$)
-  if (stored.startsWith('$2b$')) {
-    return bcrypt.compare(supplied, stored);
-  }
-  
-  // Otherwise, use our custom hash method
   try {
-    const [hashed, salt] = stored.split(".");
-    if (!hashed || !salt) {
-      console.error("Invalid password format in database");
-      return false;
-    }
-    const hashedBuf = Buffer.from(hashed, "hex");
-    const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
-    return timingSafeEqual(hashedBuf, suppliedBuf);
+    return await bcrypt.compare(supplied, stored);
   } catch (error) {
     console.error("Error comparing passwords:", error);
     return false;
